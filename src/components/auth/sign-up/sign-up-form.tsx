@@ -52,18 +52,17 @@ export function SignUpForm() {
     try {
       setIsLoading(true)
       setError("")
-      
-      // Primero registramos al usuario
+    
       const response = await authService.register(
         data.username,
         data.email,
         data.password
       )
-      
-      // Si el registro es exitoso, iniciamos sesión automáticamente
+
       await login(data.email, data.password)
-      
-      // Redirigimos al dashboard
+      if (!response.user) {
+        throw new Error("Error al registrar usuario")
+      }
       router.push("/dashboard")
     } catch (error) {
       console.error("Error al registrar:", error)

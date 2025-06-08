@@ -1,16 +1,44 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
+import { jwtDecode } from "jwt-decode"
+
+const publicRoutes = ["/auth/login", "/auth/sign-up"]
 
 export function middleware(request: NextRequest) {
-  const token = request.cookies.get("token")
-  const isAuthPage = request.nextUrl.pathname.startsWith("/auth")
+  const { pathname } = request.nextUrl
 
-  if (!token && !isAuthPage) {
-    return NextResponse.redirect(new URL("/auth/login", request.url))
+  if (publicRoutes.includes(pathname)) {
+    return NextResponse.next()
   }
 
-  if (token && isAuthPage) {
+  const token = request.cookies.get("token")?.value
+
+  if (!token && !pathname.startsWith("/auth")) {
+    const url = new URL("/auth/login", request.url)
+    url.searchParams.set("from", pathname)
+    return NextResponse.redirect(url)
+  }
+
+  if (token && pathname.startsWith("/auth")) {
     return NextResponse.redirect(new URL("/dashboard", request.url))
+  }
+
+  if (token) {
+    try {
+      const decoded = jwtDecode(token)
+      // @ts-ignore
+      const isExpired = decoded.exp * 1000 < Date.now()
+
+      if (isExpired) {
+        const response = NextResponse.redirect(new URL("/auth/login", request.url))
+        response.cookies.delete("token")
+        return response
+      }
+    } catch {
+      const response = NextResponse.redirect(new URL("/auth/login", request.url))
+      response.cookies.delete("token")
+      return response
+    }
   }
 
   return NextResponse.next()

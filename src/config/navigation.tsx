@@ -116,6 +116,7 @@ export const navigation: NavigationConfig = {
         {
           title: "Calendario",
           url: "/dashboard/clases/calendario",
+          icon: Calendar,
         },
         {
           title: "Historial",

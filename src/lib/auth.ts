@@ -1,5 +1,10 @@
 import { jwtDecode } from "jwt-decode";
-import type { User, AuthResponse, BackendRole, Role } from "@/types/auth/auth-types";
+import Cookies from 'js-cookie';
+import type {
+  User,
+  AuthResponse,
+  BackendRole,
+} from "@/types/auth/auth-types";
 import { mapBackendRole } from "@/types/auth/auth-types";
 
 interface LoginResponse {
@@ -20,8 +25,8 @@ function transformAuthResponse(response: AuthResponse): LoginResponse {
   return {
     token: response.token,
     user: {
-      id: response.username, 
-      name: response.username, 
+      id: response.username,
+      name: response.username,
       userName: response.username,
       email: response.email,
       role: mapBackendRole(response.roles[0]),
@@ -30,7 +35,6 @@ function transformAuthResponse(response: AuthResponse): LoginResponse {
 }
 
 export const authService = {
-
   /**
    * Registers a new user with the provided username, email, and password.
    * @param username - The username of the new user.
@@ -43,9 +47,8 @@ export const authService = {
     email: string,
     password: string
   ): Promise<LoginResponse> {
-
     const response = await fetch(
-      `http://localhost:8080/api/auth/register`,
+      `http://44.212.19.44:8080/api/auth/register`,
       {
         method: "POST",
         headers: {
@@ -62,12 +65,13 @@ export const authService = {
 
     const data: AuthResponse = await response.json();
     localStorage.setItem("token", data.token);
+    Cookies.set("token", data.token, { expires: 1 }); // expires in 1 day
     return transformAuthResponse(data);
   },
 
   async login(email: string, password: string): Promise<LoginResponse> {
     const response = await fetch(
-      `${process.env.BACKEND_API_URL}/auth/login`,
+      `http://44.212.19.44:8080/api/auth/login`,
       {
         method: "POST",
         headers: {
@@ -83,17 +87,19 @@ export const authService = {
 
     const data: AuthResponse = await response.json();
     localStorage.setItem("token", data.token);
+    Cookies.set("token", data.token, { expires: 1 }); // expires in 1 day
     return transformAuthResponse(data);
   },
 
-  async logout() {
+  logout() {
     localStorage.removeItem("token");
+    Cookies.remove("token");
     window.location.href = "/auth/login";
   },
 
   getToken(): string | null {
     if (typeof window !== "undefined") {
-      return localStorage.getItem("token");
+      return localStorage.getItem("token") || Cookies.get("token") || null;
     }
     return null;
   },

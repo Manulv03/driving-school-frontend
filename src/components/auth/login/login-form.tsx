@@ -21,7 +21,7 @@ import Link from "next/link"
 
 const formSchema = z.object({
   email: z.string().email("Correo electrónico inválido"),
-  password: z.string().min(4, "La contraseña debe tener al menos 4 caracteres"),
+  password: z.string().min(4, "La contraseña debe tener al menos 6 caracteres"),
 })
 
 export function LoginForm() {
@@ -46,7 +46,6 @@ export function LoginForm() {
       router.push("/dashboard")
     } catch (error) {
       setError("Credenciales inválidas")
-      console.error("Error al iniciar sesión:", error)
     } finally {
       setIsLoading(false)
     }
@@ -69,7 +68,11 @@ export function LoginForm() {
               <FormItem>
                 <FormLabel>Correo electrónico</FormLabel>
                 <FormControl>
-                  <Input placeholder="correo@ejemplo.com" {...field} />
+                  <Input
+                    placeholder="correo@ejemplo.com"
+                    {...field}
+                    disabled={isLoading}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -82,25 +85,35 @@ export function LoginForm() {
               <FormItem>
                 <FormLabel>Contraseña</FormLabel>
                 <FormControl>
-                  <Input type="password" {...field} />
+                  <Input
+                    type="password"
+                    {...field}
+                    disabled={isLoading}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
           {error && <p className="text-sm text-red-500">{error}</p>}
-          <Button type="submit" className="w-full text-neutral-50" disabled={isLoading}>
+          <Button
+            type="submit"
+            className="w-full text-neutral-50"
+            disabled={isLoading}
+          >
             {isLoading ? "Iniciando sesión..." : "Iniciar sesión"}
           </Button>
         </form>
       </Form>
       <div className="mt-4 text-center text-sm text-gray-500">
         ¿No tienes una cuenta?{" "}
-        <Link href="/auth/sign-up" className="text-blue-600 hover:underline">
+        <Link
+          href="/auth/sign-up"
+          className="text-blue-600 hover:underline"
+        >
           Regístrate aquí
         </Link>
       </div>
     </>
-
   )
 }

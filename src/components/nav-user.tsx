@@ -3,9 +3,7 @@
 import {
   BadgeCheck,
   Bell,
-  CreditCard,
   LogOut,
-  Sparkles,
 } from "lucide-react"
 
 import {

@@ -1,5 +1,5 @@
 import { LoginForm } from "@/components/auth/login/login-form"
-import { BookOpenTextIcon, GalleryVerticalEnd } from "lucide-react"
+import { BookOpenTextIcon} from "lucide-react"
 import Image from "next/image"
 
 
