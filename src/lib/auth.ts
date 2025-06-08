@@ -39,19 +39,19 @@ export const authService = {
    * @returns A promise that resolves to a LoginResponse containing the token and user information.
    */
   async register(
-    username: string,
+    user: string,
     email: string,
     password: string
   ): Promise<LoginResponse> {
 
     const response = await fetch(
-      `http://44.212.19.44:8080/auth/register`,
+      `http://localhost:8080/api/auth/register`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, email, password }),
+        body: JSON.stringify({ user, email, password }),
       }
     );
 
