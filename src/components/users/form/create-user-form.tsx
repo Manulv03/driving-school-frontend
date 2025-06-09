@@ -40,9 +40,12 @@ export function CreateUserForm() {
         onSuccess: () => {
             toast.success("Usuario creado exitosamente");
             router.push("/dashboard/users");
-        },
-        onError: (error: any) => {
-            toast.error(error.response?.data?.message || "Ha ocurrido un error al crear el usuario");
+        },        onError: (error: Error | { response?: { data?: { message?: string } } }) => {
+            if (error instanceof Error) {
+                toast.error(error.message);
+            } else {
+                toast.error(error.response?.data?.message || "Ha ocurrido un error al crear el usuario");
+            }
         },
     });
 

@@ -26,9 +26,12 @@ export default function LoginPage() {
                 </div>
                 <div className="hidden lg:flex lg:items-center lg:justify-center lg:bg-muted/50">
                     <div className="mx-auto w-full max-w-md">
-                        <img
-                            src="/driving-school.webp"
+                        <Image
+                            src="/vercel.svg"
                             alt="Conducción segura"
+                            width={80}
+                            height={80}
+                            priority
                             className="aspect-square w-full object-cover"
                         />
                     </div>
