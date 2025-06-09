@@ -29,12 +29,30 @@ function transformAuthResponse(response: AuthResponse): LoginResponse {
       name: response.username,
       userName: response.username,
       email: response.email,
-      role: mapBackendRole(response.roles[0]),
+      role: response.roles?.length ? mapBackendRole(response.roles[0]) : 'alumno', // default role
     },
   };
 }
 
 export const authService = {
+  saveUserData(userData: User) {
+    localStorage.setItem('userData', JSON.stringify(userData));
+    Cookies.set('userData', JSON.stringify(userData), { expires: 1 }); // expires in 1 day
+  },
+
+  getUserData(): User | null {
+    if (typeof window === 'undefined') return null;
+    
+    const localData = localStorage.getItem('userData');
+    const cookieData = Cookies.get('userData');
+    
+    try {
+      return localData ? JSON.parse(localData) : cookieData ? JSON.parse(cookieData) : null;
+    } catch {
+      return null;
+    }
+  },
+
   /**
    * Registers a new user with the provided username, email, and password.
    * @param username - The username of the new user.
@@ -64,9 +82,13 @@ export const authService = {
     }
 
     const data: AuthResponse = await response.json();
+    const transformedResponse = transformAuthResponse(data);
+    
     localStorage.setItem("token", data.token);
     Cookies.set("token", data.token, { expires: 1 }); // expires in 1 day
-    return transformAuthResponse(data);
+    this.saveUserData(transformedResponse.user);
+    
+    return transformedResponse;
   },
 
   async login(email: string, password: string): Promise<LoginResponse> {
@@ -86,14 +108,20 @@ export const authService = {
     }
 
     const data: AuthResponse = await response.json();
+    const transformedResponse = transformAuthResponse(data);
+    
     localStorage.setItem("token", data.token);
     Cookies.set("token", data.token, { expires: 1 }); // expires in 1 day
-    return transformAuthResponse(data);
+    this.saveUserData(transformedResponse.user);
+    
+    return transformedResponse;
   },
 
   logout() {
     localStorage.removeItem("token");
+    localStorage.removeItem("userData");
     Cookies.remove("token");
+    Cookies.remove("userData");
     window.location.href = "/auth/login";
   },
 
@@ -117,12 +145,15 @@ export const authService = {
   },
 
   getUserFromToken(): User | null {
+    const savedUser = this.getUserData();
+    if (savedUser) return savedUser;
+
     const token = this.getToken();
     if (!token) return null;
 
     try {
       const payload = jwtDecode<JWTPayload>(token);
-      return {
+      const user = {
         id: payload.sub,
         name: payload.username,
         userName: payload.username,
@@ -130,6 +161,8 @@ export const authService = {
         role: mapBackendRole(payload.roles[0]),
         avatar: undefined,
       };
+      this.saveUserData(user);
+      return user;
     } catch {
       return null;
     }

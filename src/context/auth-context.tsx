@@ -15,6 +15,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>
   logout: () => void
   isAuthenticated: boolean
+  isLoading: boolean
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
@@ -22,16 +23,21 @@ const AuthContext = createContext<AuthContextType | null>(null)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const checkAuth = () => {
-      const isAuth = authService.isAuthenticated()
-      setIsAuthenticated(isAuth)
-      if (isAuth) {
-        const userData = authService.getUserFromToken()
-        if (userData) {
-          setUser(userData)
+    const checkAuth = async () => {
+      try {
+        const isAuth = authService.isAuthenticated()
+        setIsAuthenticated(isAuth)
+        if (isAuth) {
+          const userData = authService.getUserFromToken()
+          if (userData) {
+            setUser(userData)
+          }
         }
+      } finally {
+        setIsLoading(false)
       }
     }
 
@@ -56,9 +62,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null)
     setIsAuthenticated(false)
   }
-
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated }}>
+    <AuthContext.Provider value={{ user, login, logout, isAuthenticated, isLoading }}>
       {children}
     </AuthContext.Provider>
   )

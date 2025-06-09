@@ -29,7 +29,7 @@ import { authService } from "@/lib/auth"
 
 const formSchema = z.object({
   email: z.string().email("Correo electrónico inválido"),
-  username: z.string().min(3, "El nombre de usuario debe tener al menos 3 caracteres"),
+  user: z.string().min(3, "El nombre de usuario debe tener al menos 3 caracteres"),
   password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
 })
 
@@ -43,7 +43,7 @@ export function SignUpForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
-      username: "",
+      user: "",
       password: "",
     },
   })
@@ -52,18 +52,20 @@ export function SignUpForm() {
     try {
       setIsLoading(true)
       setError("")
-    
-      const response = await authService.register(
-        data.username,
+
+      await authService.register(
+        data.user,
         data.email,
         data.password
       )
 
-      await login(data.email, data.password)
-      if (!response.user) {
-        throw new Error("Error al registrar usuario")
+      try {
+        await login(data.email, data.password)
+        router.push("/auth/login")
+      } catch (loginError) {
+        console.error("Error al iniciar sesión después del registro:", loginError)
+        router.push("/auth/login")
       }
-      router.push("/dashboard")
     } catch (error) {
       console.error("Error al registrar:", error)
       setError("Error al registrar usuario. Por favor, inténtalo de nuevo más tarde.")
@@ -85,12 +87,12 @@ export function SignUpForm() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
-              name="username"
+              name="user"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Nombre de usuario</FormLabel>
                   <FormControl>
-                    <Input 
+                    <Input
                       placeholder=" "
                       {...field}
                       className="w-full"
@@ -108,7 +110,7 @@ export function SignUpForm() {
                 <FormItem>
                   <FormLabel>Correo electrónico</FormLabel>
                   <FormControl>
-                    <Input 
+                    <Input
                       placeholder=" "
                       {...field}
                       type="email"
@@ -127,7 +129,7 @@ export function SignUpForm() {
                 <FormItem>
                   <FormLabel>Contraseña</FormLabel>
                   <FormControl>
-                    <Input 
+                    <Input
                       placeholder=" "
                       {...field}
                       type="password"

@@ -1,7 +1,9 @@
 import {
+  BookCheck,
   BookMarkedIcon,
   Calendar,
   GraduationCap,
+  Plus,
   Settings2,
   Users,
 } from "lucide-react"
@@ -31,27 +33,27 @@ export const navigation: NavigationConfig = {
       items: [
         {
           title: "Gestionar Clases",
-          url: "/dashboard/clases/gestionar",
+          url: "/dashboard/clases/manage-courses",
+          icon: BookCheck,
         },
         {
-          title: "Calendario",
-          url: "/dashboard/clases/calendario",
+          title: "Crear Clase",
+          url: "/dashboard/clases/create-course",
+          icon: Plus,
         },
       ],
     },
     {
       title: "Instructores",
-      url: "/dashboard/instructores",
+      url: "/dashboard/instructors",
       icon: GraduationCap,
       items: [
         {
           title: "Lista de Instructores",
-          url: "/dashboard/instructores/lista",
+          url: "/dashboard/instructors/manage-instructors",
+          icon: Users,
         },
-        {
-          title: "Asignar Clases",
-          url: "/dashboard/instructores/asignar",
-        },
+
       ],
     },
     {
@@ -74,6 +76,18 @@ export const navigation: NavigationConfig = {
       url: "/dashboard/configuracion",
       icon: Settings2,
     },
+    {
+      title: "Usuarios",
+      url: "/dashboard/users",
+      icon: Users,
+      items: [
+        {
+          title: "Crear Usuario",
+          url: "/dashboard/users/create-user",
+        },
+
+      ],
+    }
   ],
   instructor: [
     {
@@ -114,8 +128,8 @@ export const navigation: NavigationConfig = {
       icon: BookMarkedIcon,
       items: [
         {
-          title: "Calendario",
-          url: "/dashboard/clases/calendario",
+          title: "Agregar Clase",
+          url: "/dashboard/clases/add-class",
           icon: Calendar,
         },
         {
